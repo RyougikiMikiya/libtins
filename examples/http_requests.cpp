@@ -29,19 +29,19 @@
 
 #include <string>
 #include <iostream>
-#include <stdexcept>
-#include <boost/regex.hpp>
 #include "tins/tcp_ip/stream_follower.h"
 #include "tins/sniffer.h"
+#include <regex>
 
 using std::string;
 using std::cout;
 using std::cerr;
 using std::endl;
 using std::exception;
-
-using boost::regex;
-using boost::match_results;
+using std::regex_search;
+using std::regex;
+using std::match_results;
+using std::cmatch;
 
 using Tins::PDU;
 using Tins::Sniffer;
@@ -62,14 +62,14 @@ regex request_regex("([\\w]+) ([^ ]+).+\r\nHost: ([\\d\\w\\.-]+)\r\n");
 regex response_regex("HTTP/[^ ]+ ([\\d]+)");
 
 void on_server_data(Stream& stream) {
-    match_results<Stream::payload_type::const_iterator> client_match;
-    match_results<Stream::payload_type::const_iterator> server_match;
+    cmatch client_match;
+    cmatch server_match;
     const Stream::payload_type& client_payload = stream.client_payload();
     const Stream::payload_type& server_payload = stream.server_payload();
     // Run the regexes on client/server payloads
-    bool valid = regex_search(server_payload.begin(), server_payload.end(),
+    bool valid = regex_search((const char*)server_payload.data(), (const char*)server_payload.data() + server_payload.size(),
                               server_match, response_regex) &&
-                 regex_search(client_payload.begin(), client_payload.end(),
+                 regex_search((const char*)client_payload.data(), (const char*)client_payload.data() + client_payload.size(),
                               client_match, request_regex);
     // If we matched both the client and the server regexes
     if (valid) {

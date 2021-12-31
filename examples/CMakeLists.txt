@@ -1,5 +1,4 @@
 FIND_PACKAGE(Threads QUIET)
-FIND_PACKAGE(Boost COMPONENTS regex)
 
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/examples)
 INCLUDE_DIRECTORIES(
@@ -20,12 +19,8 @@ IF(TINS_HAVE_CXX11)
         tcp_connection_close
         traceroute
         wps_detect
+        http_requests
     )
-    IF(Boost_REGEX_FOUND)
-        SET(LIBTINS_CXX11_EXAMPLES ${LIBTINS_CXX11_EXAMPLES} http_requests)
-    ELSE()
-        MESSAGE(WARNING "Disabling HTTP requests example since boost.regex was not found")
-    ENDIF()
 ELSE(TINS_HAVE_CXX11)
     MESSAGE(WARNING "Disabling some examples since C++11 support is disabled.")
 ENDIF(TINS_HAVE_CXX11)
@@ -55,10 +50,7 @@ IF(TINS_HAVE_CXX11)
     ADD_EXECUTABLE(interfaces_info EXCLUDE_FROM_ALL interfaces_info.cpp)
     ADD_EXECUTABLE(tcp_connection_close EXCLUDE_FROM_ALL tcp_connection_close.cpp)
     ADD_EXECUTABLE(wps_detect EXCLUDE_FROM_ALL wps_detect.cpp)
-    IF (Boost_REGEX_FOUND)
-        ADD_EXECUTABLE(http_requests EXCLUDE_FROM_ALL http_requests.cpp)
-        TARGET_LINK_LIBRARIES(http_requests ${Boost_LIBRARIES})
-    ENDIF()
+    ADD_EXECUTABLE(http_requests EXCLUDE_FROM_ALL http_requests.cpp)
 ENDIF(TINS_HAVE_CXX11)
 
 ADD_EXECUTABLE(beacon_display EXCLUDE_FROM_ALL beacon_display.cpp)
